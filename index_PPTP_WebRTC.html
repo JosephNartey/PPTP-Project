@@ -1,0 +1,67 @@
+//Bidirectional Audio and Video transmission using vidyo webrtc api.
+<html>
+<head>
+  <title>Vidyo Sample</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+<body>
+  <script>
+  var vidyoConnector;
+
+   // Callback method when VidyoIO is done loading (pointer to this method is passed in the onload parameter while including the
+   // VidyoClient.js file)
+    function onVidyoClientLoaded(status) {
+      console.log("VidyoClient load state - " + status.state);
+      if (status.state == "READY") {
+        VC.CreateVidyoConnector({
+          viewId:"renderer", // Div ID where the composited video will be rendered, see VidyoConnector.html;
+          viewStyle:"VIDYO_CONNECTORVIEWSTYLE_Default", // Visual style of the composited renderer
+          remoteParticipants:10, // Maximum number of participants to render
+          logFileFilter:"error",
+          logFileName:"",
+          userData:""
+        }).then(function (vc) {
+          console.log("Create success");
+          vidyoConnector = vc;
+        }).catch(function(error){
+
+        });
+      }
+    }
+
+    function joinCall(){
+      // To implement a video/audio transmission Connect method
+      vidyoConnector.Connect({
+        host:"prod.vidyo.io",  // Server name, for most production apps it will be prod.vidyo.io
+        token:" token here ",          // Add generated token here. (https://developer.vidyo.io/documentation/4-1-16-8/getting-started#Tokens)
+        // how to generate the tokens
+        //1. go to (https://developer.vidyo.io/#/documentation) and create an account.
+        //2. Go to Tokens menu on the left and click on the Key API link in the description.
+        //3. Select keys and fill in username and time of expiry of Token and Generate token.
+        // or run the attached python script and fill in the required log in information to generate token.
+        displayName:"User2",  // Display name of the user // use this name in the token generation username.
+        resourceId:"demoRoom", // Room name must be same for both sender and receiver.
+
+        //Implement few call back functions for error checking.
+        onSuccess: function(){
+          console.log("Connected!! YAY!");
+        },
+        onFailure: function(reason){
+          console.error("Connection failed");
+        },
+        onDisconnected: function(reason) {
+          console.log(" disconnected - " + reason);
+        }
+      })
+    }
+
+  </script>
+  // Including the Vidyo.io package by adding the javascript path.
+  <script src="https://static.vidyo.io/latest/javascript/VidyoClient/VidyoClient.js?onload=onVidyoClientLoaded"></script>
+ <h3>Hello Vidyo!</h3>
+ //button to connect
+ <button onclick="joinCall()">Connect</button>
+ // Div where the video conference will be rendered
+ <div id="renderer"></div>
+</body>
+</html>
